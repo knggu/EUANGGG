@@ -37,7 +37,7 @@ class AudioPreprocess:
 
     def concat_arr(self):
         temp = [self.reshape_arr(arr) for arr in self.arr_lst]
-        return np.concatenate(temp)
+        return np.expand_dims(np.concatenate(temp), axis=0)
 
 # audio = AudioPreprocess(r"C:\Users\dave\aiffel\EUANGGG\maincode\data\dataset\audioonly\labeled\set 1\train\belly_pain\643D64AD-B711-469A-AF69-55C0D5D3E30F-1430138506-1.0-m-72-bp.wav")
 # concat = audio.concat_arr()
