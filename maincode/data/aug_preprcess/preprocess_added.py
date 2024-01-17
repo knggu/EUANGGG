@@ -38,7 +38,7 @@ class AudioPreprocess:
 
     def concat_arr(self):
         temp = [self.reshape_arr(arr) for arr in self.arr_lst]
-        return np.concatenate(temp)
+        return np.expand_dims(np.concatenate(temp), axis=0)
 
 
 class PredictProcess:
@@ -46,29 +46,28 @@ class PredictProcess:
     def __init__(self, prep_data):
         try:
             
-            input_data = prep_data
+            self.input_data = prep_data
 
-            model = tf.keras.models.load_model('DNN_ver_epo50_dr35.h5')
+            self.model = tf.keras.models.load_model('DNN_ver_epo50_dr35.h5')
 
-            predicted = model.predict(prep_data)
+            self.predicted = self.model.predict(prep_data)
 
-            index_pred = np.argmax(predicted)
+            self.index_pred = np.argmax(self.predicted)
             
-            return 
+             
         
         except Exception as e:
 
             print(f"Can't Predict Result: {e}")
             
-            index_pred = None
+            self.index_pred = None
             
-            return
         
-    def labeling(self, index_num):
+    def labeling(self):
 
         class_labels = ['belly_pain', 'discomfort', 'hungry', 'tired']
 
-        predicted_class_labels = class_labels[index_num]
+        predicted_class_labels = class_labels[self.index_pred]
 
         return predicted_class_labels
     
@@ -77,3 +76,5 @@ class PredictProcess:
 # print(concat.shape)
     
 # pred_audio = PredictProcess(concat)
+# label_audio = pred_audio.labeling()
+# print(label_audio)
