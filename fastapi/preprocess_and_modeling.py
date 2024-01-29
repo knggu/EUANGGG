@@ -1,7 +1,6 @@
 from transformers import AutoProcessor
 import librosa
 import torch
-from tqdm import tqdm
 from transformers import ASTModel
 import numpy as np
 import torch.nn.functional as F
