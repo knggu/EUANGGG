@@ -9,6 +9,8 @@ import io
 from io import BytesIO
 import base64
 import librosa
+from fastapi import Request
+import json
 
 # 예측 모듈 가져오기
 import DNN_prediction_model2
@@ -37,21 +39,34 @@ async def read_root():
     return "DNN모델을 사용하는 API를 만들업 봅시다."
 
 @app.post("/predict")
-async def predict(request_data: PredictionRequest):
-    try:        
-        print("Received request data")
-        base64_audio = request_data.input_string
-        print("Decoding base64 string")
+async def predict(request: Request):
+    try:
+        base64_audio = await request.body()
+        base64_audio = base64_audio.decode("utf-8")
         audio_bytes = base64.b64decode(base64_audio)
         
-        print("Creating BytesIO object")
+        #raw_json = await request.body()
+        #json_string = raw_json.decode("utf-8")
+        #data = json.loads(json_string)
+        #raw_base = data['input_string']
+        #audio_bytes = base64.b64decode(raw_base)
+        
+        #wav_file_path = './sample_data/test.wav'
+        #with open(wav_file_path, 'rb') as wav_file:
+        #    wav_data = wav_file.read()
+        #base64_encoded_string = base64.b64encode(wav_data)#.decode('utf-8')
+        #print(base64_encoded_string)
+        #audio_bytes = base64.b64decode(base64_encoded_string)
+        #audio_file = BytesIO(audio_bytes)
+        
         audio_file = BytesIO(audio_bytes)
         
-        audio, sr = librosa.load(audio_file, sr=16000)
+        #아래 코드는 조금 더 봐야할 것 같음
+        #with open("temp.wav", "wb") as wav_file:
+        #    wav_file.write(audio_file.getvalue())
 
-        print("Calling prediction model")
-        prediction = await DNN_prediction_model.prediction_model(audio)
-        print("Received prediction")
+        prediction = await DNN_prediction_model2.prediction_model(audio_file)
+        print(prediction)
         return {"prediction": prediction}
     except Exception as e:
         print(f"Error during prediction: {e}")
