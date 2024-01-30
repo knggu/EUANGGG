@@ -7,9 +7,9 @@ import torch.nn.functional as F
 import torch.nn as nn
 
 class CustomASTClassifier(nn.Module):
-    def __init__(self, ast_model_name, num_labels):
+    def __init__(self, config_path, num_labels):
         super().__init__()
-        self.ast = ASTModel.from_pretrained(ast_model_name)
+        self.ast = ASTModel.from_pretrained(config_path)
 
         for param in self.ast.parameters():
             param.requires_grad = False
@@ -29,11 +29,11 @@ class CustomASTClassifier(nn.Module):
         return logits
 
 class Prep_and_Modeling():
-    def __init__(self, audio_file, model_file):
+    def __init__(self, audio_file, model_file, config):
         self.audio_path = audio_file
         self.audio, self.sr = librosa.load(self.audio_path, sr = 16000)
-        self.processor = AutoProcessor.from_pretrained("MIT/ast-finetuned-audioset-10-10-0.4593")
-        self.model = CustomASTClassifier(ast_model_name="MIT/ast-finetuned-audioset-10-10-0.4593", num_labels=4)
+        self.processor = AutoProcessor.from_pretrained(config)
+        self.model = CustomASTClassifier(config, num_labels=4)
         self.model.load_state_dict(torch.load(model_file, map_location=torch.device('cpu')))
         self.model.eval()
     
@@ -64,9 +64,10 @@ class Prep_and_Modeling():
 # Paths to your audio and model files
 # audio_path = r"C:\Users\dave\aiffel\EUANGGG\maincode\data\dataset\audioonly\labeled\original_dataset\belly_pain\69BDA5D6-0276-4462-9BF7-951799563728-1436936185-1.1-m-26-bp.wav"
 # model_path = r"C:\Users\dave\aiffel\EUANGGG\maincode\data\experiment\ast_classifer_lr0001.pth"
+# config_path_prep = r"C:\Users\dave\aiffel\ast-finetuned-audioset-10-10-0.4593"
 
 # # Create an instance of your class
-# inf_init = Prep_and_Modeling(audio_path, model_path)
+# inf_init = Prep_and_Modeling(audio_path, model_path, config_path_prep)
 
 # # Preprocess the audio and perform inference
 # input_inf = inf_init.preprocess()
