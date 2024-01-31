@@ -30,18 +30,20 @@ class CustomASTClassifier(nn.Module):
 
 class Prep_and_Modeling():
     def __init__(self, audio_file, model_file, config):
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.audio_path = audio_file
         self.audio, self.sr = librosa.load(self.audio_path, sr = 16000)
         self.processor = AutoProcessor.from_pretrained(config)
         self.model = CustomASTClassifier(config, num_labels=4)
-        self.model.load_state_dict(torch.load(model_file, map_location=torch.device('cpu')))
+        self.model.load_state_dict(torch.load(model_file, map_location=self.device))
+        self.model.to(self.device)
         self.model.eval()
     
     def preprocess(self):
         input = self.processor(self.audio, sampling_rate=self.sr, return_tensor='pt')
         input_arr = np.array(input['input_values'])
         input_tensor = torch.tensor(input_arr, dtype=torch.float32)
-        squeezed_input = input_tensor.squeeze(1)
+        squeezed_input = input_tensor.squeeze(1).to(self.device)
 
         return squeezed_input
     
@@ -52,16 +54,16 @@ class Prep_and_Modeling():
             predicted_class = torch.argmax(probabilities, dim=1)
             prediction_values = probabilities
 
-            if predicted_class == torch.tensor([0]):
+            if predicted_class == torch.tensor([0]).to(self.device):
                 return '복통'
-            elif predicted_class == torch.tensor([1]):
+            elif predicted_class == torch.tensor([1].to(self.device)):
                 return '불편함'
-            elif predicted_class == torch.tensor([2]):
+            elif predicted_class == torch.tensor([2]).to(self.device):
                 return '배고픔'
             else:
                 return '피곤함'
 
-# Paths to your audio and model files
+#Paths to your audio and model files
 # audio_path = r"C:\Users\dave\aiffel\EUANGGG\maincode\data\dataset\audioonly\labeled\original_dataset\belly_pain\69BDA5D6-0276-4462-9BF7-951799563728-1436936185-1.1-m-26-bp.wav"
 # model_path = r"C:\Users\dave\aiffel\EUANGGG\maincode\data\experiment\ast_classifer_lr0001.pth"
 # config_path_prep = r"C:\Users\dave\aiffel\ast-finetuned-audioset-10-10-0.4593"
