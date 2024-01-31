@@ -56,7 +56,7 @@ class Prep_and_Modeling():
 
             if predicted_class == torch.tensor([0]).to(self.device):
                 return '복통'
-            elif predicted_class == torch.tensor([1].to(self.device)):
+            elif predicted_class == torch.tensor([1]).to(self.device):
                 return '불편함'
             elif predicted_class == torch.tensor([2]).to(self.device):
                 return '배고픔'
@@ -64,14 +64,14 @@ class Prep_and_Modeling():
                 return '피곤함'
 
 #Paths to your audio and model files
-# audio_path = r"C:\Users\dave\aiffel\EUANGGG\maincode\data\dataset\audioonly\labeled\original_dataset\belly_pain\69BDA5D6-0276-4462-9BF7-951799563728-1436936185-1.1-m-26-bp.wav"
-# model_path = r"C:\Users\dave\aiffel\EUANGGG\maincode\data\experiment\ast_classifer_lr0001.pth"
-# config_path_prep = r"C:\Users\dave\aiffel\ast-finetuned-audioset-10-10-0.4593"
+audio_path = r"C:\Users\dave\aiffel\EUANGGG\maincode\data\dataset\audioonly\labeled\original_dataset\belly_pain\69BDA5D6-0276-4462-9BF7-951799563728-1436936185-1.1-m-26-bp.wav"
+model_path = r"C:\Users\dave\aiffel\EUANGGG\maincode\data\experiment\ast_classifer_lr0001.pth"
+config_path_prep = r"C:\Users\dave\aiffel\ast-finetuned-audioset-10-10-0.4593"
 
-# # Create an instance of your class
-# inf_init = Prep_and_Modeling(audio_path, model_path, config_path_prep)
+# Create an instance of your class
+inf_init = Prep_and_Modeling(audio_path, model_path, config_path_prep)
 
-# # Preprocess the audio and perform inference
-# input_inf = inf_init.preprocess()
-# inf_result = inf_init.inference(input_inf)
-# print(inf_result)
+# Preprocess the audio and perform inference
+input_inf = inf_init.preprocess()
+inf_result = inf_init.inference(input_inf)
+print(inf_result)
