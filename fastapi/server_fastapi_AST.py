@@ -17,6 +17,11 @@ import AST_prediction_model3
 
 class PredictionRequest(BaseModel):
     input_string: str
+        
+class PredictionResponse(BaseModel):
+    prediction: str
+    success: bool
+    error_message: Union[str, None] = None
 
 # Create the FastAPI application
 app = FastAPI()
@@ -41,9 +46,9 @@ async def read_root():
 @app.post("/predict")
 async def predict(request: Request):
     try:
-        #base64_audio = await request.body()
-        #base64_audio = base64_audio.decode("utf-8")
-        #audio_bytes = base64.b64decode(base64_audio)
+        base64_audio = await request.body()
+        base64_audio = base64_audio.decode("utf-8")
+        audio_bytes = base64.b64decode(base64_audio)
         
         #raw_json = await request.body()
         #json_string = raw_json.decode("utf-8")
@@ -51,23 +56,25 @@ async def predict(request: Request):
         #raw_base = data['input_string']
         #audio_bytes = base64.b64decode(raw_base)
         
-        wav_file_path = './sample_data/test.wav'
-        with open(wav_file_path, 'rb') as wav_file:
-            wav_data = wav_file.read()
-        base64_encoded_string = base64.b64encode(wav_data)#.decode('utf-8')
-        audio_bytes = base64.b64decode(base64_encoded_string)
+        #wav_file_path = './sample_data/test.wav'
+        #with open(wav_file_path, 'rb') as wav_file:
+        #    wav_data = wav_file.read()
+        #base64_encoded_string = base64.b64encode(wav_data)#.decode('utf-8')
+        #audio_bytes = base64.b64decode(base64_encoded_string)
         #audio_file = BytesIO(audio_bytes)
         
         audio_file = BytesIO(audio_bytes)
 
-        prediction = await AST_prediction_model3.prediction_model(wav_file_path)
+        prediction = await AST_prediction_model3.prediction_model(audio_file)
         print(prediction)
-        return prediction
+        #return prediction
+        return PredictionResponse(prediction=prediction, success=True)
     except Exception as e:
         print(f"Error during prediction: {e}")
-        import traceback
-        traceback.print_exc()  # This will print the full traceback
-        raise HTTPException(status_code=500, detail=str(e))
+        #import traceback
+        #traceback.print_exc()  # This will print the full traceback
+        #raise HTTPException(status_code=500, detail=str(e))
+        return PredictionResponse(success=False, error_message=str(e))
 
 
 # Run the server
