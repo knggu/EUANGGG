@@ -18,14 +18,14 @@ class Prep_and_Onnx():
     self.ort_session = ort.InferenceSession(model_path)
 
   def preprocess(self):
-    input_audio = processor(self.audio, sampling_rate=self.sr, return_tensor='pt')
+    input_audio = self.processor(self.audio, sampling_rate=self.sr, return_tensor='pt')
     input_arr = np.array(input_audio['input_values'])
     
     return input_arr
 
-  def inference(self, input_val)
+  def inference(self, input_val):
     with torch.no_grad():
-      outputs = self.ort_session.run(None, {"modelInput":input_arr})
+      outputs = self.ort_session.run(None, {"modelInput":input_val})
       probabilities = F.softmax(torch.tensor(outputs[0][0]), dim=0)
       predicted_class = torch.argmax(probabilities)
 
