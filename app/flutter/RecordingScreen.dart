@@ -6,6 +6,14 @@ import 'package:record/record.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';  // by 24-01-22
+import 'package:flutter/material.dart';         // by 24-01-30
+import 'hungry.dart';
+import 'dart:async';
+import 'colic.dart';
+import 'inconvenience.dart';
+import 'tired.dart';
+
+
 
 class RecordingScreen extends StatefulWidget {
   const RecordingScreen({super.key});
@@ -33,7 +41,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
     audioRecord.dispose();
     audioPlayer.dispose();
   }
-  bool playing=false;
+
+  bool playing = false;
 
 
   Future<void> startRecording() async {
@@ -42,10 +51,14 @@ class _RecordingScreenState extends State<RecordingScreen> {
         // Get the directory where you want to save the recording
         final directory = await getApplicationDocumentsDirectory();
         String downloadPath = '/storage/emulated/0/Download';
-        String customPath = '${downloadPath}/myrecording${DateTime.now().millisecondsSinceEpoch}.wav';
+        String customPath = '${downloadPath}/myrecording${DateTime
+            .now()
+            .millisecondsSinceEpoch}.wav';
 
         // Start recording
-        await audioRecord.start(path: customPath); // Specify the path
+        // await audioRecord.start(path: customPath); // Specify the path
+        await audioRecord.start(
+            path: customPath, encoder: AudioEncoder.wav); // added by 24-01-29
         setState(() {
           isRecording = true;
           audioPath = customPath; // Update audioPath with the new path
@@ -57,26 +70,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 
 
-/*
-  Future<void> stopRecording() async {
-    try {
-      print("STOP RECODING+++++++++++++++++++++++++++++++++++++++++++++++++");
-      String? path = await audioRecord.stop();
-      setState(() {
-        recoding_now=false;
-        isRecording = false;
-        audioPath = path!;
-      });
 
-      // 추가한 부분: 출력 코드, 녹음한 음성 파일이 구체적으로 어디에 저장되는지를 알려주는 print문임
-      print("audioPath: $audioPath");
-
-    } catch (e) {
-      print("STOP RECODING+++++++++++++++++++++${e}+++++++++++++++++++++++++++");
-    }
-  }
-
- */
 
 // 아래 코드는 위의 stopRecording 함수를 대체하여 녹음을 멈춘 후에 AudioConverter 클래스를 사용하여 스트림 변환을 추가함 by added 24-01-23
   Future<void> stopRecording() async {
@@ -84,7 +78,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
       print("STOP RECODING+++++++++++++++++++++++++++++++++++++++++++++++++");
       String? path = await audioRecord.stop();
       setState(() {
-        recoding_now=false;
+        recoding_now = false;
         isRecording = false;
         audioPath = path!;
       });
@@ -94,29 +88,21 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
       // print(Uri.base);  // added by 24-01-26
 
-      /*
-      // Windows 11에서 전체 경로를 출력하도록 수정
-      if (Platform.isWindows) {
-       // String packageName = "{앱 패키지 이름}"; // 실제 패키지 이름으로 대체
-        String fullPath = audioPath.replaceAll("/storage/emulated/0/", "C:\\Users\\asus\\AppData\\Local\\Packages\\$packageName\\LocalState\\");
-        print("Full Windows Path: $fullPath");
-      }
-      */
-
-      // 추가한 부분: 출력 코드, 녹음한 음성 파일이 구체적으로 어디에 저장되는지를 알려주는 print문임
+     // 추가한 부분: 출력 코드, 녹음한 음성 파일이 구체적으로 어디에 저장되는지를 알려주는 print문임
       print("audioPath: $audioPath");
 
       // 오디오 파일을 변환하여 Base64 문자열로 가져오기
-      String base64String = await AudioConverter().convertAudioFileToBase64String(audioPath); // 실제 변환된 base64 문자열을 파일로 저장하지는 않음
+      String base64String = await AudioConverter()
+          .convertAudioFileToBase64String(
+          audioPath); // 실제 변환된 base64 문자열을 파일로 저장하지는 않음
 
       // 변환된 Base64 문자열 사용 예시
       print("Base64 문자열: $base64String");
-
     } catch (e) {
-      print("STOP RECODING+++++++++++++++++++++${e}+++++++++++++++++++++++++++");
+      print(
+          "STOP RECODING+++++++++++++++++++++${e}+++++++++++++++++++++++++++");
     }
   }
-
 
 
 
@@ -134,19 +120,20 @@ class _RecordingScreenState extends State<RecordingScreen> {
           playing = false;
 
 
-          print("AUDIO PLAYING ENDED+++++++++++++++++++++++++++++++++++++++++++++++++");
+          print(
+              "AUDIO PLAYING ENDED+++++++++++++++++++++++++++++++++++++++++++++++++");
           setState(() {});
         }
       });
-
     } catch (e) {
-      print("AUDIO PLAYING++++++++++++++++++++++++${e}+++++++++++++++++++++++++");
+      print(
+          "AUDIO PLAYING++++++++++++++++++++++++${e}+++++++++++++++++++++++++");
     }
   }
 
   Future<void> pauseRecording() async {
     try {
-      playing=false;
+      playing = false;
 
       print("AUDIO PAUSED+++++++++++++++++++++++++++++++++++++++++++++++++");
 
@@ -156,62 +143,19 @@ class _RecordingScreenState extends State<RecordingScreen> {
       });
       //print('Hive Playing Recording ${voiceRecordingsBox.values.cast<String>().toList().toString()}');
     } catch (e) {
-      print("AUDIO PAUSED++++++++++++++++++++++++${e}+++++++++++++++++++++++++");
+      print(
+          "AUDIO PAUSED++++++++++++++++++++++++${e}+++++++++++++++++++++++++");
     }
   }
 
-/*
-  Future<void> uploadAndDeleteRecording() async {
-    try {
-      final url = Uri.parse('YOUR_UPLOAD_URL'); // Replace with your server's upload URL
 
-      final file = File(audioPath);
-      if (!file.existsSync()) {
-        print("UPLOADING FILE NOT EXIST+++++++++++++++++++++++++++++++++++++++++++++++++");
-        return;
-      }
-      print("UPLOADING FILE ++++++++++++++++${audioPath}+++++++++++++++++++++++++++++++++");
-      final request = http.MultipartRequest('POST', url)
-        ..files.add(
-          http.MultipartFile(
-            'audio',
-            file.readAsBytes().asStream(),
-            file.lengthSync(),
-            filename: 'audio.mp3', // You may need to adjust the file extension
-          ),
-        );
-
-      final response = await http.Response.fromStream(await request.send());
-
-      if (response.statusCode == 200) {
-        // Upload successful, you can delete the recording if needed
-        // Show a snackbar or any other UI feedback for a successful upload
-        const snackBar = SnackBar(
-          content: Text('Audio uploaded.'),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-        // Refresh the UI
-        setState(() {
-          audioPath = "";
-        });
-      } else {
-        // Handle the error or show an error message
-        print('Failed to upload audio. Status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error uploading audio: $e');
-    }
-  }
-
-*/
-
-
-// 아래의 upload 코드에서는 'header' 매개변수를 사용하여 요청의 헤더에 'Content-Type: text/plain'을 추가하여 base64 형식으로
-// 데이터를 전송한다. 필요에 따라 서버 측에서도 base64 형식을 처리할 수 있도록 구현이 필요하다.
-// 또한 서버로부터 응답에 대한 결과를 받아서 터미널에 출력한다.
 
 /*
+아래의 upload 코드에서는 'header' 매개변수를 사용하여 요청의 헤더에 'Content-Type: text/plain'을 추가하여 base64 형식으로
+데이터를 전송한다. 필요에 따라 서버 측에서도 base64 형식을 처리할 수 있도록 구현이 필요하다.
+또한 서버로부터 응답에 대한 결과를 받아서 터미널에 출력한다.
+
+
   Future<void> uploadAndDeleteRecording() async {       // added by 24-01-24
     try {
       // final url = Uri.parse('YOUR_SERVER_UPLOAD_URL');  // 실제 서버의 업로드 URL로 바꿔주세요
@@ -219,7 +163,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
       // final url = Uri.parse('http://127.0.0.1:5000');    //  localhost로 TEST
       // final url = Uri.parse('http://10.0.2.2:6000');    //  localhost로 TEST, 다른 플러터 앱의 main.dart로 데이터 전송 성공함
       // final url = Uri.parse('http://192.168.0.104:6000');    // 실제 핸드폰에서 서버로 TEST, 다른 플러터 앱의 main.dart로 데이터 전송 성공함
-      final url = Uri.parse('https://f248-222-106-39-138.ngrok-free.app/predict');    //  영진님것 ngrox 테스트 url, 일회성 주소이기 떄문에 계속해서 url이 바뀐다.
+      final url = Uri.parse('https://bb26-222-106-39-138.ngrok-free.app/predict');    //  영진님것 ngrox 테스트 url, 일회성 주소이기 떄문에 계속해서 url이 바뀐다.
 
       final file = File(audioPath);
       if (!file.existsSync()) {
@@ -232,6 +176,12 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
       // 데이터를 JSON 형식으로 변환
       // String jsonData = jsonEncode({'audioBase64': base64String});
+
+      // App에서 서버로 Data 송신 후에 이 부분에서 로딩 화면으로 이동 by 24-10-30
+       Navigator.push(
+         context,
+         MaterialPageRoute(builder: (context) => LoadingScreen()),
+       );
 
       // HTTP POST 요청을 사용하여 base64 데이터를 서버로 전송
       final response = await http.post(
@@ -263,12 +213,13 @@ class _RecordingScreenState extends State<RecordingScreen> {
     }
   }
 
-*/
+ */
 
 // 아래의 upload 코드에서는 'header' 매개변수를 사용하여 요청의 헤더에 'Content-Type: application/json'을 추가하여 JSON 형식으로
 // 데이터를 전송한다. 필요에 따라 서버 측에서도 JSON 형식을 처리할 수 있도록 구현이 필요하다.
 // 또한 서버로부터 응답에 대한 결과를 받아서 터미널에 출력한다.
 
+/*
   Future<void> uploadAndDeleteRecording() async {           // added by 24-01-24
     try {
       // final url = Uri.parse('YOUR_SERVER_UPLOAD_URL');   // 실제 서버의 업로드 URL로 바꿔주세요
@@ -322,6 +273,200 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 
 
+import 'package:flutter/material.dart'; // 추가
+
+Future<void> uploadAndDeleteRecording() async { // 24-01-24에 추가됨
+  try {
+    // 서버 업로드 URL로 변경하십시오.
+    final url = Uri.parse('https://bb26-222-106-39-138.ngrok-free.app/predict'); // 영진의 ngrox 테스트 URL입니다. 주소가 계속 변경되기 때문에 일회성 주소입니다.
+
+    final file = File(audioPath);
+    if (!file.existsSync()) {
+      print("UPLOADING FILE NOT EXIST++++++++++++++++++++++++++++++++++++++++++++++++++");
+      return;
+    }
+
+    // AudioConverter를 사용하여 오디오 파일을 Base64 문자열로 변환합니다.
+    String base64String = await AudioConverter().convertAudioFileToBase64String(audioPath);
+
+    // 데이터를 JSON 형식으로 변환
+    // String jsonData = jsonEncode({'audioBase64': base64String});
+
+    // 데이터를 서버로 보낸 후, 로딩 화면으로 이동합니다. 24-10-30에 추가
+    displayLoadingScreen(context); // 변경된 부분
+
+    // HTTP POST 요청을 사용하여 base64 데이터를 서버로 보냅니다.
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'text/plain'},
+      body: base64String,
+    );
+
+    print('Server Response: ${response.body}'); // 서버 응답 내용 확인 24-01-25에 추가
+
+    // 로딩 화면 이동 후 서버 응답에 상관없이 항상 실행되는 코드
+    setState(() {
+      audioPath = "";
+    });
+
+    // 서버 응답이 "hungry"일 경우 HungryPage를 표시하는 함수 호출
+    if (response.statusCode == 200 && response.body == 'hungry') {
+      displayHungryPage(context); // 변경된 부분
+    } else {
+      // 업로드 실패 시 오류 처리
+      print('Failed to upload audio. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    // 예외 처리
+    print('Error uploading audio: $e');
+  }
+}
+
+// 로딩 화면을 표시하는 함수
+void displayLoadingScreen(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => LoadingScreen()),
+  );
+}
+
+// "hungry.dart" 페이지를 표시하는 함수
+void displayHungryPage(BuildContext context) {
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => HungryPage()),
+  );
+}
+
+ */
+
+
+/*
+아래 upload코드에서 displayLoadingScreen 함수는 데이터를 서버로 전송하는 동안에 항상 호출되며,
+서버 응답에 관계없이 항상 로딩 화면이 표시됩니다. 그 후 서버 응답을 확인하고,
+응답이 "hungry"이면 displayHungryPage 함수가 호출되어 "hungry" 페이지를 표시합니다.
+이렇게 변경하면 데이터를 서버에 전성후 항상 로딩 화면이 표시되고, 서버 응답에 따라 적절한 페이지가 표시된다  by 24-01-31
+
+ */
+  Future<void> uploadAndDeleteRecording() async {
+    // 24-01-24에 추가됨
+    try {
+      // 서버 업로드 URL로 변경하십시오.
+      final url = Uri.parse(
+          'https://a669-222-106-39-138.ngrok-free.app/predict'); // 영진의 ngrox 테스트 URL입니다. 주소가 계속 변경되기 때문에 일회성 주소입니다.
+
+      final file = File(audioPath);
+      if (!file.existsSync()) {
+        print(
+            "UPLOADING FILE NOT EXIST++++++++++++++++++++++++++++++++++++++++++++++++++");
+        return;
+      }
+
+      // AudioConverter를 사용하여 오디오 파일을 Base64 문자열로 변환합니다.
+      String base64String = await AudioConverter()
+          .convertAudioFileToBase64String(audioPath);
+
+      // 데이터를 JSON 형식으로 변환
+      // String jsonData = jsonEncode({'audioBase64': base64String});
+
+      // 데이터를 서버로 보낸 후, 로딩 화면으로 이동합니다. 24-10-30에 추가
+      displayLoadingScreen(context); // 변경된 부분
+
+      // HTTP POST 요청을 사용하여 base64 데이터를 서버로 보냅니다.
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'text/plain'},
+        body: base64String,
+      );
+
+      print('Server Response: ${response.body}'); // 서버 응답 내용 확인 24-01-25에 추가
+
+      // 로딩 화면 이동 후 서버 응답에 상관없이 항상 실행되는 코드
+      setState(() {
+        audioPath = "";
+      });
+
+      // 아래의 코드는 상태 코드가 200인지 확인 후에 디코드한 JSON의 문자열이 "hungry"인지 확인 후에 조건이 참인 경우 hungry.dart 페이지를 표시한다.
+      final data = jsonDecode(
+          response.body); // else if 문이 data 변수를 참조할 수 있게 if 문 밖으로 이동시킴.
+
+      if (response.statusCode == 200) {
+
+        print('Prediction: ${data['prediction']}');
+        print('Sucess: ${data['success']}');
+        print('Error Message: ${data['error_message']}');
+
+        //Check if the decoded JSON data is the string "hungry"
+        if (data['prediction'] == 'hungry') {
+          print('The prediction is hungry');
+          // }
+          // else <-- 왜 있는지? 있어도 아래의 Navigator이 실행된다. 왜?
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => hungry()), // 변경된 부분
+          );
+        } else if (data['prediction'] == 'bellypain') {
+          print('The prediction is bellypain');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => colic()), // 변경된 부분
+          );
+        } else if (data['prediction'] == 'discomfort') {
+          print('The prediction is discomfort');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => inconvenience()), // 변경된 부분
+          );
+        } else if (data['prediction'] == 'tired') {
+          print('The prediction is tired');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => tired()), // 변경된 부분
+          );
+          /*
+          else {
+          // 예외 처리
+          print('Failed to upload audio. Status code: ${response.statusCode}');
+        }
+        */
+        }
+      }
+    } catch (e) { // 예외 처리
+      print('Error uploading audio: $e');
+
+    }
+  }
+    // else {
+    // 예외 처리
+    //print('Failed to upload audio. Status code: ${response.statusCode}');
+  // }
+// }
+
+
+
+
+
+
+
+// 로딩 화면을 표시하는 함수
+  void displayLoadingScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LoadingScreen()),
+    );
+  }
+
+// "hungry.dart" 페이지를 표시하는 함수
+  void displayHungryPage(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => hungry()),
+    );
+  }
+
+
+
+
 
 
   Future<void> deleteRecording() async {
@@ -355,7 +500,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
         title: const Text('Voice Recorder'),
       ),
       body: Column(
-        //mainAxisAlignment: MainAxisAlignment.end, // 아이콘을 맨 아래에 정렬
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Spacer(),
@@ -424,15 +568,59 @@ class AudioConverter {
   }
 }
 
-// 아래는 실제 저장된 오디오 파일을 스트림(Byte)으로 변환하는지 확인하는 코드임 by 24-01-22
+
 
 /*
-void main() async {
-  AudioConverter converter = AudioConverter();
-// String filePath = '/path/to/your/audiofile.mp3'; // Replace with your actual file path
+아래의 코드는 업로드 함수를 실행시킨 후 서버에 데이터를 보낸 후에 바로 로딩중 페이지를 표시하는 코드이다 by 24-01-30
+ */
 
-  String base64String = await converter.convertAudioFileToBase64String(filePath);
-  print(base64String); // This will print the Base64 encoded string of your file
+class LoadingScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: SizedBox.shrink(), // 타이틀 숨기기
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 외부 Container에 테두리를 그리고, 내부의 CircularProgressIndicator는 테두리를 비워두고 회전
+            SizedBox(
+              width: 100,  // 원의 크기 조절
+              height: 100, // 원의 크기 조절
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.transparent, // 로딩 원의 내부를 비우기
+                  border: Border.all(
+                    color: Colors.lightGreen, // 외부 Container의 테두리 색상 변경
+                    width: 8.0,  // 외부 Container의 테두리 두께 조절
+                  ),
+                ),
+                child: Center(
+                  child: SizedBox(
+                    width: 80,  // CircularProgressIndicator의 크기를 조절
+                    height: 80, // CircularProgressIndicator의 크기를 조절
+                    child: CircularProgressIndicator(
+                      strokeWidth: 4.0,  // CircularProgressIndicator의 테두리 두께 조절
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.lightGreen), // CircularProgressIndicator의 테두리 색상 변경
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),  // 로딩 원과 텍스트 사이 간격 조절
+            Text(
+              '분석 중입니다',  // "Analyzing" 텍스트 표시
+              style: TextStyle(fontSize: 48),  // 텍스트 크기 조절
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
-*/
+
+
 
