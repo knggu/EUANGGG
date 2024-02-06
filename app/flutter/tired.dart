@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'home.dart';
+
+/*
 void main() {
   runApp(MyApp());
 }
@@ -13,9 +16,9 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+*/
 
-
-class TiredPage extends StatelessWidget {
+class tired extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +38,10 @@ class TiredPage extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => home()),
+                );
                 // 홈으로 이동하는 기능을 구현하세요.
                 // 예를 들면 Navigator를 사용하여 홈 화면으로 이동할 수 있습니다.
               },
