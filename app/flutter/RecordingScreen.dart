@@ -353,7 +353,7 @@ void displayHungryPage(BuildContext context) {
     try {
       // 서버 업로드 URL로 변경하십시오.
       final url = Uri.parse(
-          'https://a669-222-106-39-138.ngrok-free.app/predict'); // 영진의 ngrox 테스트 URL입니다. 주소가 계속 변경되기 때문에 일회성 주소입니다.
+          'https://d4e1-222-106-39-138.ngrok-free.app/predict'); // 영진의 ngrox 테스트 URL입니다. 주소가 계속 변경되기 때문에 일회성 주소입니다.
 
       final file = File(audioPath);
       if (!file.existsSync()) {
