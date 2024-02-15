@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'Detail_Inconvenience.dart';
+import 'Detailed_Tired.dart';
+import 'Detailed_Colic.dart';
+import 'Detailed_Hungry.dart';
 import 'home.dart';
 import 'colic.dart';
 import 'hungry.dart';
@@ -25,8 +28,11 @@ class MyApp extends StatelessWidget {
         '/hungry.dart': (context) => hungry(),
         '/inconvenience.dart': (context) => inconvenience(),
         '/tired.dart': (context) => tired(),
-        '/analyzed.dart': (context) => analyzed()
+        '/analyzed.dart': (context) => analyzed(),
         '/Detail_Inconvenience.dart': (context) => detailed_inconvenience(),
+        '/Detailed_Tired.dart': (context) => detailed_tired(),
+        '/Detailed_Colic': (context) => detailed_colic(),
+        '/Detailed_Hungry': (context) => detailed_hungry(),
       },
     );
   }

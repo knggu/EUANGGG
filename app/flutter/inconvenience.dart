@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'Detailed_Colic.dart';
+import 'Detailed_Hungry.dart';
 import 'home.dart';
 import 'Detail_Inconvenience.dart';
+import 'Detailed_Tired.dart';
 
 
 
@@ -49,7 +52,8 @@ class inconvenience extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => home()),
+                  MaterialPageRoute(builder: (context) => detailed_inconvenience()), // detailed_inconvenience,  detailed_tired
+
                 );
               },
               child: Text("상세 페이지", style: TextStyle(fontSize: 42)),
