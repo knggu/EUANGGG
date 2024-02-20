@@ -1,6 +1,7 @@
 import numpy as np
 import librosa
 import tensorflow_hub as hub
+import tensorflow as tf
 
 class AudioPreprocess:
     def __init__(self, wav_file):
@@ -39,6 +40,41 @@ class AudioPreprocess:
         temp = [self.reshape_arr(arr) for arr in self.arr_lst]
         return np.expand_dims(np.concatenate(temp), axis=0)
 
-# audio = AudioPreprocess(r"C:\Users\dave\aiffel\EUANGGG\maincode\data\dataset\audioonly\labeled\set 1\train\belly_pain\643D64AD-B711-469A-AF69-55C0D5D3E30F-1430138506-1.0-m-72-bp.wav")
+
+class PredictProcess:
+    
+    def __init__(self, prep_data):
+        try:
+            
+            self.input_data = prep_data
+
+            self.model = tf.keras.models.load_model('DNN_ver_epo50_dr35.h5')
+
+            self.predicted = self.model.predict(prep_data)
+
+            self.index_pred = np.argmax(self.predicted)
+            
+             
+        
+        except Exception as e:
+
+            print(f"Can't Predict Result: {e}")
+            
+            self.index_pred = None
+            
+        
+    def labeling(self):
+
+        class_labels = ['belly_pain', 'discomfort', 'hungry', 'tired']
+
+        predicted_class_labels = class_labels[self.index_pred]
+
+        return predicted_class_labels
+    
+# audio = AudioPreprocess(r"C:/Users/Desk_Kang/Desktop/Aiffel/workplace/lib/Aiffelthon/data3/train\belly_pain\belly_pain (1).wav")
 # concat = audio.concat_arr()
 # print(concat.shape)
+    
+# pred_audio = PredictProcess(concat)
+# label_audio = pred_audio.labeling()
+# print(label_audio)
