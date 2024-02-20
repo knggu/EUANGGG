@@ -12,7 +12,7 @@ class Prep_and_Onnx():
     def __init__(self, audio_file, model_path, config):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.audio_path = audio_file
-        self.audio, self.sr = librosa.load(self.audio_path, sr = 16000)
+        self.audio, self.sr = librosa.load(self.audio_path, sr = 20000)
         self.processor = AutoProcessor.from_pretrained(config)
         self.ort_session = ort.InferenceSession(model_path)
 
@@ -39,7 +39,7 @@ class Prep_and_Onnx():
 
 async def prediction_model(input_0):
     #model = tf.keras.models.load_model('./ast_classifer_lr0001.pth')
-    model_path = './ASTClassifier.onnx'
+    model_path = './ASTClassifier_fin.onnx'
     config_path_prep = './ast-finetuned-audioset-10-10-0.4593'
     
     inf_init = Prep_and_Onnx(input_0, model_path, config_path_prep)
