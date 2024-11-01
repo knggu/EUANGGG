@@ -38,7 +38,7 @@ app.add_middleware(
 @app.get("/")
 async def read_root():
     print("url was requested")
-    return "AST모델을 사용하는 API를 만들업 봅시다."
+    return "AST모델을 사용하는 API"
 
 @app.post("/predict")
 async def predict(request: Request):
